@@ -6,6 +6,28 @@ SwiftUI 애플리케이션을 위한 경량 단방향 상태 관리 라이브러
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%2017+%20|%20macOS%2014+%20|%20tvOS%2017+%20|%20watchOS%2010+%20|%20visionOS%201+-blue.svg)](https://developer.apple.com/xcode/)
 [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
 
+## 목차
+
+- [개요](#개요)
+- [요구사항](#요구사항)
+- [설치](#설치)
+- [핵심 개념](#핵심-개념)
+  - [State (상태)](#state-상태)
+  - [Action (액션)](#action-액션)
+  - [Reducer (리듀서)](#reducer-리듀서)
+  - [Effect (부수 효과)](#effect-부수-효과)
+  - [Store (스토어)](#store-스토어)
+- [사용법](#사용법)
+  - [기본 예제: 카운터](#기본-예제-카운터)
+  - [고급 예제: API 통합](#고급-예제-api-통합)
+- [테스트](#테스트)
+- [아키텍처](#아키텍처)
+- [모범 사례](#모범-사례)
+- [예제](#예제)
+- [기여하기](#기여하기)
+- [라이선스](#라이선스)
+- [감사의 글](#감사의-글)
+
 ## 개요
 
 ReducerKit은 단방향 데이터 플로우 패턴을 사용하여 SwiftUI 애플리케이션의 상태를 관리하는 간단하면서도 강력한 방법을 제공합니다. 예측 가능하고, 테스트 가능하며, 유지보수가 쉬운 애플리케이션을 만들 수 있습니다.
