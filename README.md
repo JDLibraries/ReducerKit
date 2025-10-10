@@ -399,5 +399,5 @@ ReducerKit은 MIT 라이선스로 제공됩니다. 자세한 내용은 LICENSE �
 
 ## 감사의 글
 
-- [The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture)에서 영감을 받음
+[The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture)에서 영감을 받음
 
