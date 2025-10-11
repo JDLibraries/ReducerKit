@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import ReducerKit
 
 /// Counter 기능을 위한 Reducer
@@ -14,6 +15,7 @@ struct CounterReducer: Reducer {
     // MARK: - State
 
     /// Counter 화면의 상태
+    @ObservableState
     struct State: Equatable {
         /// 현재 카운트 값
         var count: Int = 0
@@ -55,9 +57,11 @@ struct CounterReducer: Reducer {
             // 현재 count 값을 캡처하여 네트워크 요청
             return .run { [count = state.count] send in
                 do {
-                    let (data, _) = try await URLSession.shared.data(
-                        from: URL(string: "http://numbersapi.com/\(count)/trivia")!
+                    let request = URLRequest(
+                        url: URL(string: "http://numbersapi.com/\(count)/trivia")!,
+                        timeoutInterval: 5
                     )
+                    let (data, _) = try await URLSession.shared.data(for: request)
                     let fact = String(decoding: data, as: UTF8.self)
                     await send(.numberFactResponse(fact))
                 } catch {

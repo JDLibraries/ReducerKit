@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+
 import ReducerKit
 
-struct ContentView: View {
+struct CounterView: View {
 
     @State private var store = Store(
         initialState: CounterReducer.State(),
@@ -18,7 +19,7 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 40) {
             // 카운트 표시
-            Text("\(store.state.count)")
+            Text("\(store.count)")
                 .font(.system(size: 80, weight: .bold))
 
             // 버튼들
@@ -47,7 +48,7 @@ struct ContentView: View {
                 Button(action: {
                     store.send(.numberFactButtonTapped)
                 }) {
-                    if store.state.isLoading {
+                    if store.isLoading {
                         ProgressView()
                             .frame(width: 200, height: 50)
                     } else {
@@ -57,11 +58,24 @@ struct ContentView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.purple)
-                .disabled(store.state.isLoading)
+                .disabled(store.isLoading)
             }
 
             // 숫자 팩트 표시
-            if let fact = store.state.numberFact {
+            NumberFactView(store: store)
+        }
+        .padding()
+    }
+}
+
+private struct NumberFactView: View {
+    
+    let store: Store<CounterReducer>
+    
+    var body: some View {
+        VStack {
+            let _ = Self._printChanges()
+            if let fact = store.numberFact {
                 Text(fact)
                     .font(.body)
                     .multilineTextAlignment(.center)
@@ -70,10 +84,9 @@ struct ContentView: View {
                     .cornerRadius(10)
             }
         }
-        .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    CounterView()
 }

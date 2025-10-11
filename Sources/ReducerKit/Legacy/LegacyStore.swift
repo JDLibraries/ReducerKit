@@ -1,5 +1,5 @@
 //
-//  Store.swift
+//  LegacyStore.swift
 //  ReducerKit
 //
 //  Created by 이정동 on 10/3/25.
@@ -15,8 +15,9 @@ import Foundation
 /// 3. Effect가 있다면 비동기 작업을 실행하고, 완료 시 새로운 Action을 다시 보냄
 ///
 /// @MainActor로 격리되어 UI 업데이트가 항상 메인 스레드에서 실행됩니다.
+@available(*, deprecated, renamed: "Store", message: "Use Store with @ObservableState instead. This type will be removed in 2.0.0")
 @MainActor @Observable
-public final class Store<R: Reducer> {
+public final class LegacyStore<R: Reducer> {
 
     public typealias State = R.State
     public typealias Action = R.Action
