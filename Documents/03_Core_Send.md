@@ -449,42 +449,42 @@ print(triple(5))  // 15 - 함수처럼 호출
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 1. Reducer가 Effect 반환                                      │
-│    return .run { send in                                     │
-│        await send(.action)                                   │
-│    }                                                         │
+│    return .run { send in                                    │
+│        await send(.action)                                  │
+│    }                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 2. Store가 Send 객체 생성                                     │
+│ 2. Store가 Send 객체 생성                                      │
 │    let send = Send { [weak self] action in                  │
 │        await self?.send(action)  // Store의 send 메서드       │
-│    }                                                         │
+│    }                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 3. Effect가 Send를 받아 실행                                  │
-│    Task.detached {                                           │
-│        await operation(send)  // Effect 클로저에 Send 전달    │
-│    }                                                         │
+│ 3. Effect가 Send를 받아 실행                                    │
+│    Task.detached {                                          │
+│        await operation(send)  // Effect 클로저에 Send 전달      │
+│    }                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 4. Effect 내부에서 Send 호출                                  │
+│ 4. Effect 내부에서 Send 호출                                   │
 │    await send(.dataLoaded(data))  // callAsFunction 호출     │
-│          ↓                                                   │
+│          ↓                                                  │
 │    await send.callAsFunction(.dataLoaded(data))             │
-│          ↓                                                   │
-│    await send.send(.dataLoaded(data))  // 프로퍼티 호출       │
-│          ↓                                                   │
+│          ↓                                                  │
+│    await send.send(.dataLoaded(data))  // 프로퍼티 호출        │
+│          ↓                                                  │
 │    await store.send(.dataLoaded(data))  // Store의 메서드     │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 5. Store가 Reducer의 reduce 호출                             │
+│ 5. Store가 Reducer의 reduce 호출                              │
 │    let effect = reduce(&_state, .dataLoaded(data))          │
 └─────────────────────────────────────────────────────────────┘
 ```
