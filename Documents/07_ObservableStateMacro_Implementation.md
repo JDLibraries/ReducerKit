@@ -674,86 +674,86 @@ print(MacroError.notAStruct)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 1. 소스 코드                                                 │
-│    @ObservableState                                          │
-│    struct MyState {                                          │
-│        var count: Int = 0                                    │
-│        var isLoading: Bool = false                           │
-│    }                                                          │
+│ 1. 소스 코드                                                  │
+│    @ObservableState                                         │
+│    struct MyState {                                         │
+│        var count: Int = 0                                   │
+│        var isLoading: Bool = false                          │
+│    }                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 2. SwiftSyntax 파싱                                          │
-│    StructDeclSyntax(                                         │
-│        name: "MyState",                                      │
-│        members: [                                            │
+│    StructDeclSyntax(                                        │
+│        name: "MyState",                                     │
+│        members: [                                           │
 │            VariableDeclSyntax(pattern: "count", ...),       │
 │            VariableDeclSyntax(pattern: "isLoading", ...)    │
-│        ]                                                     │
-│    )                                                         │
+│        ]                                                    │
+│    )                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 3. 매크로 expansion 호출                                     │
-│    ObservableStateMacro.expansion(                           │
-│        declaration: StructDeclSyntax,                        │
-│        type: "MyState",                                      │
-│        ...                                                   │
-│    )                                                         │
+│ 3. 매크로 expansion 호출                                       │
+│    ObservableStateMacro.expansion(                          │
+│        declaration: StructDeclSyntax,                       │
+│        type: "MyState",                                     │
+│        ...                                                  │
+│    )                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 4. 저장 프로퍼티 추출                                         │
-│    properties = [                                            │
+│ 4. 저장 프로퍼티 추출                                            │
+│    properties = [                                           │
 │        VariableDeclSyntax(pattern: "count"),                │
 │        VariableDeclSyntax(pattern: "isLoading")             │
-│    ]                                                         │
+│    ]                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 5. KeyPath 배열 생성                                         │
-│    keyPathsArray = "\Self.count, \Self.isLoading"          │
+│ 5. KeyPath 배열 생성                                          │
+│    keyPathsArray = "\Self.count, \Self.isLoading"           │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 6. switch cases 생성                                         │
-│    switchCases = """                                         │
-│        case \Self.count:                                     │
-│            return oldValue.count != newValue.count           │
-│        case \Self.isLoading:                                 │
-│            return oldValue.isLoading != newValue.isLoading   │
-│    """                                                       │
+│    switchCases = """                                        │
+│        case \Self.count:                                    │
+│            return oldValue.count != newValue.count          │
+│        case \Self.isLoading:                                │
+│            return oldValue.isLoading != newValue.isLoading  │
+│    """                                                      │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 7. Extension 코드 생성                                        │
-│    extension MyState: ObservableStateProtocol {              │
-│        public static var _$observableKeyPaths: ... {         │
+│    extension MyState: ObservableStateProtocol {             │
+│        public static var _$observableKeyPaths: ... {        │
 │            [\Self.count, \Self.isLoading]                   │
-│        }                                                     │
-│        public static func hasChanged(...) -> Bool {          │
-│            switch keyPath {                                  │
-│            case \Self.count:                                 │
-│                return oldValue.count != newValue.count       │
-│            case \Self.isLoading:                             │
-│                return old...isLoading != new...isLoading     │
-│            default:                                          │
-│                return false                                  │
-│            }                                                 │
-│        }                                                     │
-│    }                                                         │
+│        }                                                    │
+│        public static func hasChanged(...) -> Bool {         │
+│            switch keyPath {                                 │
+│            case \Self.count:                                │
+│                return oldValue.count != newValue.count      │
+│            case \Self.isLoading:                            │
+│                return old...isLoading != new...isLoading    │
+│            default:                                         │
+│                return false                                 │
+│            }                                                │
+│        }                                                    │
+│    }                                                        │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 8. 컴파일러에 반환                                            │
-│    return [ExtensionDeclSyntax]                              │
+│ 8. 컴파일러에 반환                                              │
+│    return [ExtensionDeclSyntax]                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
