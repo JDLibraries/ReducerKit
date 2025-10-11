@@ -74,6 +74,22 @@ public final class Store<R: Reducer> where R.State: ObservableStateProtocol {
     }
 
     /// 전체 state 접근 (호환성을 위해 제공)
+    ///
+    /// ⚠️ **성능 주의**: 이 프로퍼티를 사용하면 State의 **모든 프로퍼티** 변경 시
+    /// View가 다시 그려집니다. 성능 최적화를 위해 `@dynamicMemberLookup`을 사용하세요.
+    ///
+    /// ```swift
+    /// // ❌ 비효율적 - 모든 프로퍼티 변경 시 업데이트
+    /// Text("\(store.state.count)")
+    ///
+    /// // ✅ 권장 - count 변경 시에만 업데이트
+    /// Text("\(store.count)")
+    /// ```
+    ///
+    /// **사용 사례**:
+    /// - 전체 State를 함수에 전달해야 하는 경우
+    /// - 디버깅을 위해 전체 상태를 확인해야 하는 경우
+    /// - State 스냅샷을 저장해야 하는 경우
     public var state: State {
         get {
             // 모든 KeyPath의 Observable 버전을 읽어서 전체 관찰 등록

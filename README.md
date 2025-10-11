@@ -38,6 +38,7 @@ ReducerKit은 단방향 데이터 플로우 패턴을 사용하여 SwiftUI 애�
 - **타입 안전**: Swift의 타입 시스템을 활용한 컴파일 타임 안전성
 - **부수 효과 관리**: 상태 변경과 비동기 작업의 명확한 분리
 - **SwiftUI 통합**: `@Observable`을 기반으로 한 원활한 SwiftUI 통합
+- **세밀한 관찰**: `@ObservableState` 매크로로 프로퍼티별 View 업데이트 최적화
 - **동시성 안전**: `@MainActor`와 `Sendable`을 활용한 완전한 Swift Concurrency 지원
 - **경량**: 최소한의 의존성과 간단한 API
 - **테스트 가능**: Reducer와 상태 변경을 쉽게 테스트
@@ -73,15 +74,23 @@ dependencies: [
 
 ### State (상태)
 
-State는 기능이 표시하고 동작하는 데 필요한 모든 데이터를 나타냅니다. 효율적인 변경 감지를 위해 `Equatable`을 준수해야 합니다.
+State는 기능이 표시하고 동작하는 데 필요한 모든 데이터를 나타냅니다. `@ObservableState` 매크로를 사용하여 프로퍼티별 세밀한 관찰을 활성화합니다.
 
 ```swift
-struct State: Equatable {
+import ReducerKit
+
+@ObservableState
+struct CounterState: Equatable {
     var count: Int = 0
     var isLoading: Bool = false
     var errorMessage: String?
 }
 ```
+
+`@ObservableState` 매크로는:
+- 각 프로퍼티를 개별적으로 관찰 가능하게 만듭니다
+- 변경된 프로퍼티를 사용하는 View만 업데이트합니다
+- SwiftUI의 성능을 최적화합니다
 
 ### Action (액션)
 
@@ -166,6 +175,7 @@ let store = Store(
 import ReducerKit
 
 struct CounterReducer: Reducer {
+    @ObservableState
     struct State: Equatable {
         var count: Int = 0
         var isLoading: Bool = false
@@ -227,7 +237,8 @@ struct CounterView: View {
 
     var body: some View {
         VStack(spacing: 40) {
-            Text("\(store.state.count)")
+            // ✅ dynamicMemberLookup으로 직접 접근 (권장)
+            Text("\(store.count)")
                 .font(.system(size: 80, weight: .bold))
 
             HStack(spacing: 16) {
@@ -244,9 +255,9 @@ struct CounterView: View {
             Button("숫자 팩트 가져오기") {
                 store.send(.numberFactButtonTapped)
             }
-            .disabled(store.state.isLoading)
+            .disabled(store.isLoading)  // ✅ 권장
 
-            if let fact = store.state.numberFact {
+            if let fact = store.numberFact {  // ✅ 권장
                 Text(fact)
                     .padding()
                     .background(Color.gray.opacity(0.1))
@@ -262,6 +273,7 @@ struct CounterView: View {
 
 ```swift
 struct TodosReducer: Reducer {
+    @ObservableState
     struct State: Equatable {
         var todos: [Todo] = []
         var isLoading: Bool = false
@@ -375,12 +387,29 @@ ReducerKit은 단방향 데이터 플로우를 따릅니다:
 
 ## 모범 사례
 
-1. **Reducer를 순수하게 유지**: Reducer는 상태만 수정해야 하며, 직접 부수 효과를 수행하면 안 됩니다
-2. **비동기 작업에 Effect 사용**: 모든 비동기 작업은 Effect를 통해야 합니다
-3. **Effect에서 값 캡처**: 경쟁 조건을 피하기 위해 Effect를 생성할 때 필요한 상태 값을 캡처하세요
-4. **단일 진실 공급원**: 모든 기능 상태를 하나의 State 구조체에 보관하세요
-5. **Action 구성**: 도메인별로 액션을 구성하기 위해 중첩된 enum을 사용하세요
-6. **Reducer 테스트**: 부수 효과와 독립적으로 상태 변경을 테스트하세요
+1. **@ObservableState 매크로 사용**: 모든 State struct에 `@ObservableState`를 적용하세요
+2. **dynamicMemberLookup 활용**: View에서 `store.count` 형태로 직접 접근하여 성능 최적화
+3. **Reducer를 순수하게 유지**: Reducer는 상태만 수정해야 하며, 직접 부수 효과를 수행하면 안 됩니다
+4. **비동기 작업에 Effect 사용**: 모든 비동기 작업은 Effect를 통해야 합니다
+5. **Effect에서 값 캡처**: 경쟁 조건을 피하기 위해 Effect를 생성할 때 필요한 상태 값을 캡처하세요
+6. **단일 진실 공급원**: 모든 기능 상태를 하나의 State 구조체에 보관하세요
+7. **Action 구성**: 도메인별로 액션을 구성하기 위해 중첩된 enum을 사용하세요
+8. **Reducer 테스트**: 부수 효과와 독립적으로 상태 변경을 테스트하세요
+
+### 성능 최적화 팁
+
+```swift
+// ❌ 비효율적 - 모든 프로퍼티 변경 시 업데이트
+Text("\(store.state.count)")
+
+// ✅ 권장 - count 변경 시에만 업데이트
+Text("\(store.count)")
+```
+
+**state 프로퍼티는 다음 경우에만 사용:**
+- 전체 State를 함수에 전달해야 할 때
+- 디버깅 목적으로 전체 상태를 확인할 때
+- State 스냅샷을 저장해야 할 때
 
 ## 예제
 
