@@ -92,32 +92,32 @@ KeyPath 기반 세밀한 관찰을 위한 컴포넌트들입니다.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ View                                                         │
-│   - store.count 읽기 (dynamicMemberLookup)                  │
-│   - store.send(.action) 호출                                │
+│ View                                                        │
+│   - store.count 읽기 (dynamicMemberLookup)                   │
+│   - store.send(.action) 호출                                 │
 └─────────────────┬──────────────────────┬────────────────────┘
                   │                      │
                   │ 읽기                 │ 액션 전송
                   ▼                      ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ Store (@MainActor @Observable)                               │
-│   - subscript(dynamicMember:) → ObservableVersion 관찰 등록  │
-│   - send(_:) → Reducer 호출 → updateVersions                │
+│ Store (@MainActor @Observable)                              │
+│   - subscript(dynamicMember:) → ObservableVersion 관찰 등록   │
+│   - send(_:) → Reducer 호출 → updateVersions                 │
 └─────────────────┬──────────────────────┬────────────────────┘
                   │                      │
-                  │ reduce 호출          │ Effect 실행
+                  │ reduce 호출           │ Effect 실행
                   ▼                      ▼
 ┌──────────────────────────┐  ┌──────────────────────────────┐
 │ Reducer                  │  │ Effect                       │
 │   - reduce(state, action)│  │   - .none or .run { send }   │
-│   - return Effect        │  │   - 비동기 작업 실행          │
+│   - return Effect        │  │   - 비동기 작업 실행             │
 └──────────────────────────┘  └──────────────┬───────────────┘
                                               │
                                               │ send(.newAction)
                                               ▼
                                     ┌──────────────────────┐
                                     │ Send                 │
-                                    │   - Store.send 호출  │
+                                    │   - Store.send 호출   │
                                     └──────────────────────┘
 ```
 
@@ -131,13 +131,13 @@ State { count, isLoading, text }
    └─ \State.text ───────┘
                           │
                           ▼
-              ┌─────────────────────────────────┐
-              │ observableVersions Dictionary   │
-              │                                 │
-              │  \.count     → ObservableVersion│
-              │  \.isLoading → ObservableVersion│
-              │  \.text      → ObservableVersion│
-              └─────────────┬───────────────────┘
+              ┌──────────────────────────────────┐
+              │ observableVersions Dictionary    │
+              │                                  │
+              │  \.count     → ObservableVersion │
+              │  \.isLoading → ObservableVersion │
+              │  \.text      → ObservableVersion │
+              └─────────────┬────────────────────┘
                             │
                             │ View가 store.count 읽을 때
                             ▼
