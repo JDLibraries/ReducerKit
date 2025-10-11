@@ -677,58 +677,58 @@ Effect의 비동기 작업은 백그라운드에서 실행하고, 완료 후 `se
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ View                                                         │
-│   Text("\(store.count)")  ← 1. count 읽기                   │
+│ View                                                        │
+│   Text("\(store.count)")  ← 1. count 읽기                    │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ Store.subscript(dynamicMember: \.count)                     │
-│   - observableVersions[\.count].value 읽기                  │
-│     → @Observable이 View를 관찰자로 등록                     │
+│   - observableVersions[\.count].value 읽기                   │
+│     → @Observable이 View를 관찰자로 등록                         │
 │   - return _state.count                                     │
 └─────────────────────────────────────────────────────────────┘
 
 ... (사용자가 버튼 클릭) ...
 
 ┌─────────────────────────────────────────────────────────────┐
-│ View                                                         │
+│ View                                                        │
 │   Button("Increment") {                                     │
-│       store.send(.increment)  ← 2. Action 전송              │
-│   }                                                          │
+│       store.send(.increment)  ← 2. Action 전송               │
+│   }                                                         │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ Store.send(.increment)                                      │
-│   1. oldState 저장                                          │
-│   2. reduce(&_state, .increment) 호출                       │
-│      → Reducer가 state.count += 1 수행                      │
+│   1. oldState 저장                                           │
+│   2. reduce(&_state, .increment) 호출                        │
+│      → Reducer가 state.count += 1 수행                        │
 │   3. updateVersions(from: oldState, to: newState)           │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ Store.updateVersions()                                      │
-│   for keyPath in [\.count, \.isLoading, ...] {             │
-│       if State.hasChanged(keyPath, old, new) {              │
-│           observableVersions[keyPath].value += 1  ← 3. 버전 증가
-│       }                                                      │
-│   }                                                          │
+│   for keyPath in [\.count, \.isLoading, ...] {              │
+│     if State.hasChanged(keyPath, old, new) {                │
+│       observableVersions[keyPath].value += 1  ← 3. 버전 증가  │
+│     }                                                       │
+│   }                                                         │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ @Observable 시스템                                           │
-│   observableVersions[\.count].value가 변경됨                │
-│   → 이 프로퍼티를 관찰하는 View에게 알림                     │
+│ @Observable 시스템                                            │
+│   observableVersions[\.count].value가 변경됨                  │
+│   → 이 프로퍼티를 관찰하는 View에게 알림                            │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ View 업데이트                                                │
-│   Text("\(store.count)")  ← 4. 다시 그려짐                  │
-│   (isLoading이나 다른 프로퍼티를 사용하는 View는 그대로)      │
+│ View 업데이트                                                 │
+│   Text("\(store.count)")  ← 4. 다시 그려짐                     │
+│   (isLoading이나 다른 프로퍼티를 사용하는 View는 그대로)              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
