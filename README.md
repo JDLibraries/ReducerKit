@@ -58,7 +58,7 @@ Swift Package Manager를 사용하여 프로젝트에 ReducerKit을 추가하세
 1. Xcode에서 **File > Add Package Dependencies...** 선택
 2. 저장소 URL 입력:
 ```
-https://github.com/yourusername/ReducerKit
+https://github.com/JDLibraries/ReducerKit
 ```
 3. 사용할 버전 선택
 
@@ -66,7 +66,7 @@ https://github.com/yourusername/ReducerKit
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/ReducerKit", from: "1.0.0")
+    .package(url: "https://github.com/JDLibraries/ReducerKit", from: "1.0.0")
 ]
 ```
 
