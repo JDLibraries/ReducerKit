@@ -46,13 +46,6 @@ public final class Store<R: Reducer> where R.State: ObservableStateProtocol {
     @ObservationIgnored
     private let reduce: (inout State, Action) -> Effect<Action>
 
-    /// KeyPath별 버전 관리 저장소 (관찰하지 않음)
-    ///
-    /// 이 Dictionary 자체는 관찰하지 않습니다.
-    /// 대신 각 KeyPath별 computed property를 통해 개별 버전을 노출합니다.
-    @ObservationIgnored
-    private var _keyPathVersions: [PartialKeyPath<State>: Int] = [:]
-
     /// KeyPath별 Observable 버전 저장
     ///
     /// 각 KeyPath를 개별 Observable 프로퍼티로 노출하기 위한 저장소
@@ -68,7 +61,6 @@ public final class Store<R: Reducer> where R.State: ObservableStateProtocol {
 
         // 모든 KeyPath의 초기 버전 설정
         for keyPath in State._$observableKeyPaths {
-            _keyPathVersions[keyPath] = 0
             observableVersions[AnyHashable(keyPath)] = ObservableVersion()
         }
     }
