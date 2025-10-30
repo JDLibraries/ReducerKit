@@ -237,7 +237,7 @@ struct CounterView: View {
 
     var body: some View {
         VStack(spacing: 40) {
-            // ✅ dynamicMemberLookup으로 직접 접근 (권장)
+            // ✅ dynamicMemberLookup으로 직접 접근 (필수)
             Text("\(store.count)")
                 .font(.system(size: 80, weight: .bold))
 
@@ -255,9 +255,9 @@ struct CounterView: View {
             Button("숫자 팩트 가져오기") {
                 store.send(.numberFactButtonTapped)
             }
-            .disabled(store.isLoading)  // ✅ 권장
+            .disabled(store.isLoading)  // ✅ 필수
 
-            if let fact = store.numberFact {  // ✅ 권장
+            if let fact = store.numberFact {  // ✅ 필수
                 Text(fact)
                     .padding()
                     .background(Color.gray.opacity(0.1))
@@ -388,7 +388,7 @@ ReducerKit은 단방향 데이터 플로우를 따릅니다:
 ## 모범 사례
 
 1. **@ObservableState 매크로 사용**: 모든 State struct에 `@ObservableState`를 적용하세요
-2. **dynamicMemberLookup 활용**: View에서 `store.count` 형태로 직접 접근하여 성능 최적화
+2. **dynamicMemberLookup 활용**: View에서 **반드시** `store.count` 형태로 직접 접근하세요 (스냅샷이 아닌 관찰 가능한 접근)
 3. **Reducer를 순수하게 유지**: Reducer는 상태만 수정해야 하며, 직접 부수 효과를 수행하면 안 됩니다
 4. **비동기 작업에 Effect 사용**: 모든 비동기 작업은 Effect를 통해야 합니다
 5. **Effect에서 값 캡처**: 경쟁 조건을 피하기 위해 Effect를 생성할 때 필요한 상태 값을 캡처하세요
@@ -396,20 +396,22 @@ ReducerKit은 단방향 데이터 플로우를 따릅니다:
 7. **Action 구성**: 도메인별로 액션을 구성하기 위해 중첩된 enum을 사용하세요
 8. **Reducer 테스트**: 부수 효과와 독립적으로 상태 변경을 테스트하세요
 
-### 성능 최적화 팁
+### View에서 State 접근 방법
 
 ```swift
-// ❌ 비효율적 - 모든 프로퍼티 변경 시 업데이트
+// ❌ View에서는 금지됨 - 스냅샷으로 접근하면 업데이트 감지 안 됨
 Text("\(store.state.count)")
 
-// ✅ 권장 - count 변경 시에만 업데이트
+// ✅ View에서는 필수 - dynamicMemberLookup으로 접근
 Text("\(store.count)")
 ```
 
-**state 프로퍼티는 다음 경우에만 사용:**
-- 전체 State를 함수에 전달해야 할 때
-- 디버깅 목적으로 전체 상태를 확인할 때
-- State 스냅샷을 저장해야 할 때
+**`store.state` 프로퍼티는 다음 경우에만 사용:**
+- 전체 State를 함수에 전달할 때
+- 디버깅/로깅 목적으로 전체 상태를 확인할 때
+- State 스냅샷을 저장할 때
+
+**View에서는 절대로 `store.state`를 사용하지 마세요. 접근 시점의 스냅샷을 반환하므로 이후 변경을 감지할 수 없습니다.**
 
 ## 예제
 

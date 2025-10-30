@@ -18,7 +18,6 @@ public final class Store<R: Reducer> where R.State: ObservableStateProtocol {
     // 저장 프로퍼티
     @ObservationIgnored private var _state: State
     @ObservationIgnored private let reduce: (inout State, Action) -> Effect<Action>
-    @ObservationIgnored private var _keyPathVersions: [PartialKeyPath<State>: Int]
     private var observableVersions: [AnyHashable: ObservableVersion]
 
     // 공개 API
@@ -312,14 +311,6 @@ private let reduce: (inout State, Action) -> Effect<Action>
 - 클로저로 저장하여 매번 Reducer 인스턴스를 참조하지 않아도 됨
 
 ```swift
-@ObservationIgnored
-private var _keyPathVersions: [PartialKeyPath<State>: Int] = [:]
-```
-
-- 각 KeyPath의 버전을 숫자로 저장
-- 실제로는 사용하지 않지만, 디버깅이나 확장에 유용할 수 있음
-
-```swift
 private var observableVersions: [AnyHashable: ObservableVersion] = [:]
 ```
 
@@ -336,7 +327,6 @@ public init(initialState: State, reducer: R) {
 
     // 모든 KeyPath의 초기 버전 설정
     for keyPath in State._$observableKeyPaths {
-        _keyPathVersions[keyPath] = 0
         observableVersions[AnyHashable(keyPath)] = ObservableVersion()
     }
 }
@@ -401,49 +391,13 @@ let dict: [AnyHashable: ObservableVersion] = [
 
 ```swift
 public var state: State {
-    get {
-        // 모든 KeyPath의 Observable 버전을 읽어서 전체 관찰 등록
-        for keyPath in State._$observableKeyPaths {
-            if let version = observableVersions[AnyHashable(keyPath)] {
-                _ = version.value  // ← 관찰 등록
-            }
-        }
-        return _state
-    }
+    get { _state }
 }
 ```
 
-#### ⚠️ 성능 주의사항
+#### 사용 목적
 
-`store.state`를 사용하면 State의 **모든 프로퍼티** 변경 시 View가 업데이트됩니다.
-
-**비효율적인 사용:**
-```swift
-struct MyView: View {
-    let store: Store<MyReducer>
-
-    var body: some View {
-        Text("\(store.state.count)")  // ❌ state를 통해 접근
-        // → isLoading, text 등 다른 프로퍼티 변경 시에도 업데이트됨
-    }
-}
-```
-
-**권장 사용:**
-```swift
-struct OptimizedView: View {
-    let store: Store<MyReducer>
-
-    var body: some View {
-        Text("\(store.count)")  // ✅ dynamicMemberLookup으로 직접 접근
-        // → count 변경 시에만 업데이트
-    }
-}
-```
-
-#### state 프로퍼티를 사용해야 하는 경우
-
-다음과 같은 경우에만 `state`를 사용하세요:
+`state` 프로퍼티는 **읽기 전용**으로 제공되며, 다음과 같은 경우에 사용됩니다:
 
 1. **전체 State를 함수에 전달**
    ```swift
@@ -460,6 +414,33 @@ struct OptimizedView: View {
    ```swift
    let snapshot = store.state  // 현재 상태 복사
    ```
+
+#### ⚠️ View에서의 사용
+
+View의 body에서 `store.state`를 직접 접근하지 마세요:
+
+```swift
+// ❌ 피해야 할 사용
+struct MyView: View {
+    let store: Store<MyReducer>
+
+    var body: some View {
+        Text("\(store.state.count)")  // 스냅샷으로 접근 → 업데이트 안 됨
+    }
+}
+
+// ✅ 권장 사용
+struct OptimizedView: View {
+    let store: Store<MyReducer>
+
+    var body: some View {
+        Text("\(store.count)")  // dynamicMemberLookup으로 직접 접근
+        // → count 변경 시에만 업데이트
+    }
+}
+```
+
+**이유**: `store.state`는 접근 시점의 상태 스냅샷을 반환하므로, 이후 State 변경을 감지할 수 없습니다. 반드시 `@dynamicMemberLookup`을 통해 개별 프로퍼티에 접근하세요.
 
 ### 6. dynamicMemberLookup subscript (핵심!)
 
