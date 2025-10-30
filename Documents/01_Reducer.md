@@ -266,8 +266,3 @@ incrementInPlace(&count)  // & 기호로 참조 전달
 ### 4. Effect 반환
 - 순수 함수 유지: 부수 효과를 반환값으로 분리
 - 테스트 용이성: 상태 변경과 부수 효과를 독립적으로 테스트 가능
-
-## 다음 단계
-
-- [Effect 타입](./02_Core_Effect.md) - 부수 효과를 표현하는 방법
-- [Send 타입](./03_Core_Send.md) - Effect 내부에서 액션을 전송하는 방법

@@ -773,10 +773,3 @@ map + nil 제거를 한 번에 수행
 
 ### 5. 멀티라인 문자열
 """로 여러 줄 문자열을 쉽게 작성
-
-## 다음 단계
-
-이제 ReducerKit의 모든 핵심 컴포넌트를 이해했습니다!
-
-- [01_Core_Reducer.md](./01_Core_Reducer.md) - 처음부터 다시 복습
-- [Examples/Counter](../Examples/Counter) - 실제 동작하는 예제 코드

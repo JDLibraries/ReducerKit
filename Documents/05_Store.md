@@ -798,7 +798,3 @@ struct ContentView: View {
 ### 5. KeyPath 기반 관찰
 변경된 프로퍼티를 관찰하는 View만 업데이트
 
-## 다음 단계
-
-- [ObservableState 매크로](./06_ObservableState_Macro.md) - @ObservableState 매크로 사용법
-- [매크로 구현](./07_ObservableStateMacro_Implementation.md) - 매크로가 코드를 생성하는 방법

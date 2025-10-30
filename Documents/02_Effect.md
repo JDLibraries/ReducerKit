@@ -483,8 +483,3 @@ return .run { send in
 ### 3. Send를 파라미터로 제공
 - Effect 내부에서 Store로 액션을 전송할 수 있는 방법 제공
 - 비동기 작업 완료 후 결과를 State에 반영 가능
-
-## 다음 단계
-
-- [Send 타입](./03_Core_Send.md) - Effect 내부에서 액션을 전송하는 방법
-- [Store 타입](./04_Store.md) - Effect를 실제로 실행하는 방법

@@ -549,7 +549,3 @@ public macro ObservableState()
 ### 4. 생성 코드
 ObservableStateProtocol 준수를 위한 _$observableKeyPaths와 hasChanged 메서드
 
-## 다음 단계
-
-- [매크로 구현](./07_ObservableStateMacro_Implementation.md) - 매크로가 어떻게 코드를 생성하는지 자세히
-- [전체 흐름 이해](./08_Complete_Flow.md) - 모든 컴포넌트가 어떻게 협력하는지

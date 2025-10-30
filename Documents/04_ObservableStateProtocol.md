@@ -468,8 +468,3 @@ hasChanged로 프로퍼티별 변경 감지 가능
 인스턴스 메서드로는 oldValue와 newValue를 동시에 비교하기 어려움
 static 메서드로 두 값을 받아 비교
 
-## 다음 단계
-
-- [Store 타입](./05_Store.md) - 프로토콜을 사용하여 세밀한 관찰 구현
-- [ObservableState 매크로](./06_ObservableState_Macro.md) - 프로토콜 준수 코드 자동 생성
-- [매크로 구현](./07_ObservableStateMacro_Implementation.md) - 매크로가 어떻게 코드를 생성하는지

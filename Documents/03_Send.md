@@ -504,7 +504,3 @@ print(triple(5))  // 15 - 함수처럼 호출
 - 비동기 Task에서 안전하게 사용
 - 스레드 간 안전한 전달 보장
 
-## 다음 단계
-
-- [Store 타입](./04_Store.md) - Send를 생성하고 Effect를 실행하는 방법
-- [ObservableState 프로토콜](./05_ObservableStateProtocol.md) - 세밀한 관찰을 위한 프로토콜
