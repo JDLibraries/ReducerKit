@@ -11,6 +11,7 @@ SwiftUI 애플리케이션을 위한 경량 단방향 상태 관리 라이브러
 - [개요](#개요)
 - [요구사항](#요구사항)
 - [설치](#설치)
+- [문서](#문서)
 - [핵심 개념](#핵심-개념)
   - [State (상태)](#state-상태)
   - [Action (액션)](#action-액션)
@@ -66,9 +67,13 @@ https://github.com/JDLibraries/ReducerKit
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JDLibraries/ReducerKit", from: "1.0.0")
+    .package(url: "https://github.com/JDLibraries/ReducerKit", from: "2.0.0")
 ]
 ```
+
+## 문서
+
+ReducerKit의 완전한 API 문서는 [Swift Package Index](https://swiftpackageindex.com/JDLibraries/ReducerKit)에서 확인할 수 있습니다.
 
 ## 핵심 개념
 
@@ -111,6 +116,11 @@ enum Action: Sendable {
 
 ```swift
 struct MyReducer: Reducer {
+
+    // ...
+    // State, Action 정의
+    // ...
+
     func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
         case .increment:
