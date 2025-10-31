@@ -216,7 +216,7 @@ class Store<R: Reducer> where R.State: ObservableStateProtocol {
 
 ```swift
 @Observable
-private final class ObservableVersion {
+final class ObservableVersion {
     var value: Int = 0
 }
 ```

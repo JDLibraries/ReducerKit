@@ -7,30 +7,63 @@
 
 import Foundation
 
-/// KeyPath별 버전을 개별적으로 관찰 가능하게 만드는 래퍼
-@Observable
-private final class ObservableVersion {
-    var value: Int = 0
-}
-
-/// KeyPath 기반 세밀한 관찰을 지원하는 Store
+/// KeyPath 기반 세밀한 관찰을 지원하는 상태 관리자
 ///
-/// @ObservableState가 적용된 State를 사용하면
-/// 프로퍼티별 변경을 추적하여 필요한 View만 업데이트합니다.
+/// Store는 ReducerKit의 핵심 타입으로, 애플리케이션의 상태를 저장하고 관리합니다.
+/// @ObservableState가 적용된 State를 사용하면 프로퍼티별 변경을 추적하여
+/// 필요한 View만 업데이트합니다.
 ///
-/// 사용 예시:
+/// ## 주요 기능
+///
+/// - **상태 저장**: 애플리케이션의 현재 상태를 보관합니다.
+/// - **Action 처리**: View에서 전달받은 Action을 Reducer에 전달합니다.
+/// - **Effect 실행**: Reducer가 반환한 부수 효과를 실행합니다.
+/// - **세밀한 관찰**: KeyPath 기반으로 변경된 프로퍼티만 View를 업데이트합니다.
+///
+/// ## 사용 예시
+///
 /// ```swift
-/// @ObservableState
-/// struct CounterState: Equatable {
-///     var count: Int = 0
-///     var isLoading: Bool = false
+/// struct CounterReducer: Reducer {
+///     @ObservableState
+///     struct State: Equatable {
+///         var count: Int = 0
+///         var isLoading: Bool = false
+///     }
+///
+///     enum Action: Sendable {
+///         case increment
+///     }
+///
+///     func reduce(into state: inout State, action: Action) -> Effect<Action> {
+///         switch action {
+///         case .increment:
+///             state.count += 1
+///             return .none
+///         }
+///     }
 /// }
 ///
-/// let store = Store(
-///     initialState: CounterState(),
-///     reducer: CounterReducer()
-/// )
+/// struct ContentView: View {
+///     @State private var store = Store(
+///         initialState: CounterReducer.State(),
+///         reducer: CounterReducer()
+///     )
+///
+///     var body: some View {
+///         Text("\\(store.count)")
+///         Button("+") {
+///             store.send(.increment)
+///         }
+///     }
+/// }
 /// ```
+///
+/// ## View에서의 접근
+///
+/// - **올바른 방법**: `store.count` (dynamicMemberLookup 사용)
+/// - **피해야 할 방법**: `store.state.count` (스냅샷으로 접근 → 업데이트 감지 안 됨)
+///
+/// - SeeAlso: ``Reducer``, ``Effect``, ``Send``
 @MainActor @Observable
 @dynamicMemberLookup
 public final class Store<R: Reducer> where R.State: ObservableStateProtocol {
@@ -140,10 +173,13 @@ public final class Store<R: Reducer> where R.State: ObservableStateProtocol {
         case .none:
             break
         case let .run(operation):
+            // Effect 내부에서 새로운 Action을 전송하기 위한 Send 객체 생성
             let send = Send<Action> { [weak self] action in
+                // Send를 통해 전달된 Action을 Store에서 처리
                 await self?.send(action)
             }
 
+            // 비동기 작업을 백그라운드 Task에서 실행 (메인 스레드 분리)
             Task.detached {
                 await operation(send)
             }
